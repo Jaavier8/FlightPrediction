@@ -1,0 +1,26 @@
+*******spark-submit********
+
+-https://sparkbyexamples.com/spark/spark-submit-command/
+-~/Escritorio/BDFI/ProyectoFinal/spark/spark$ ./bin/spark-submit --help
+
+Funcionamiento correcto: +1
+-javier@javier:~/Escritorio/BDFI/ProyectoFinal/spark/spark/bin$ ./spark-submit --master local --deploy-mode client --class es.upm.dit.ging.predictor.MakePrediction --name FlightPrediction --packages org.mongodb.spark:mongo-spark-connector_2.12:3.0.1,org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.2 ../../../practica_big_data_2019/flight_prediction/target/scala-2.12/flight_prediction_2.12-0.1.jar
+
+Antes de la ejecución, hay que generar el fichero jar que se pasa como argumento. El fichero jar se obtiene con sbt. Para ello, nos colocamos en la carpeta raíz del proyecto (~/Escritorio/BDFI/ProyectoFinal/practica_big_data_2019) y ejecutamos: 'sbt compile' y 'sbt package'. El fichero se guarda en target/scala-2.12/flight_prediction_2.12-0.1.jar
+
+*******dockerizar********
+-Kafka_zookeeper: https://hub.docker.com/r/bitnami/kafka
+-create kafka topic: https://stackoverflow.com/questions/64865361/docker-compose-create-kafka-topics
+
+-mongodb: https://faun.pub/managing-mongodb-on-docker-with-docker-compose-26bf8a0bbae3
+-Para llenar la base de datos hay que ejecutar el script import_distances.sh, lo haremos desde otro contenedor init(como en el caso de kafka)
+-Probando desde el host, se ejecuta el siguiente comando: 
+    -mongoimport --authenticationDatabase=admin --uri="mongodb://admin:password@127.0.0.1:27017/agile_data_science" -d agile_data_science -c origin_dest_distances --file ../practica_big_data_2019/data/origin_dest_distances.jsonl
+    -mongo -u "admin" -p "password" mongodb://admin:password@127.0.0.1:27017/agile_data_science --authenticationDatabase "admin" --eval 'db.origin_dest_distances.createIndex({Origin: 1, Dest: 1})'
+-Para probar, una vez levantado mongo:
+    -docker exec -it "container" mongosh
+    -use admin
+    -db.auth("admin","password")
+    -use agile_data_science
+    -show tables
+    -db.origin_dest_distances.find()
