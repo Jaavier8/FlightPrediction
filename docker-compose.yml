@@ -41,10 +41,10 @@ services:
       kafka-topics.sh --bootstrap-server kafka:9092 --list
       "
 
-  # webapp:
-  #   image: "./webapp"
-  #   ports:
-  #     - "5000:5000"
+  webapp:
+    build: "./webapp"
+    ports:
+      - "5000:5000"
 
   mongodb:
     image: "mongo"

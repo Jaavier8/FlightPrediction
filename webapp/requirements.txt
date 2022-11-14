@@ -1,0 +1,5 @@
+Flask
+pyelasticsearch
+pymongo
+iso8601
+kafka-python
