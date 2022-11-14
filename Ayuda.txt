@@ -25,6 +25,8 @@ Antes de la ejecución, hay que generar el fichero jar que se pasa como argument
     -show tables
     -db.origin_dest_distances.find()
 
+-mongodbinit: necesario para ejecutar los comandos de las líneas 18 y 19 (descargar datos que se importan en mongo y crear índice)
+
 -webapp: cambios en predict_flask.py
     - línea 15 para indicar dirección de mongodb (hay que pasar así la dirección ya que lleva la autenticación implicita)
     - línea 28 para indicar dirección de kafka

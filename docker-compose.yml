@@ -55,6 +55,27 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=password
 
+  mongodb-init:
+    image: "mongo"
+    depends_on:
+      - mongodb
+    entrypoint: [ 'bin/sh', '-c' ]
+    command: |
+      "
+      # blocks until mongodb is reachable
+      sleep 5
+
+      apt-get update
+      apt-get install -y curl
+
+      echo -e 'Downloading data'
+      curl -Lko ./origin_dest_distances.jsonl http://s3.amazonaws.com/agile_data_science/origin_dest_distances.jsonl
+
+      echo -e 'Importing resources'
+      mongoimport --authenticationDatabase=admin --uri="mongodb://admin:password@mongodb:27017/agile_data_science" -d agile_data_science -c origin_dest_distances --file origin_dest_distances.jsonl
+      mongosh -u "admin" -p "password" mongodb://admin:password@mongodb:27017/agile_data_science --authenticationDatabase "admin" --eval 'db.origin_dest_distances.createIndex({Origin: 1, Dest: 1})'
+      "
+
 #volumes:
 #  zookeeper_data:
 #    driver: local
