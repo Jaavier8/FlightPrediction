@@ -24,3 +24,7 @@ Antes de la ejecución, hay que generar el fichero jar que se pasa como argument
     -use agile_data_science
     -show tables
     -db.origin_dest_distances.find()
+
+-webapp: cambios en predict_flask.py
+    - línea 15 para indicar dirección de mongodb (hay que pasar así la dirección ya que lleva la autenticación implicita)
+    - línea 28 para indicar dirección de kafka
