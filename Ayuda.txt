@@ -30,3 +30,16 @@ Antes de la ejecución, hay que generar el fichero jar que se pasa como argument
 -webapp: cambios en predict_flask.py
     - línea 15 para indicar dirección de mongodb (hay que pasar así la dirección ya que lleva la autenticación implicita)
     - línea 28 para indicar dirección de kafka
+
+-spark:
+-javier@javier:~/Escritorio/BDFI/ProyectoFinal/Mejora_Docker$ ./../spark/spark/bin/spark-submit --master spark://127.0.0.1:7077 --deploy-mode cluster --class es.upm.dit.ging.predictor.MakePrediction --name FlightPrediction --packages org.mongodb.spark:mongo-spark-connector_2.12:3.0.1,org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.2 ../practica_big_data_2019/flight_prediction/target/scala-2.12/flight_prediction_2.12-0.1.jar
+    -Primer error encontrado: Si ejecuto la instrucción anterior desde el host, los workers de spark buscan el jar en /home/javier/Escritorio/BDFI/ProyectoFinal/Mejora_Docker/../practica_big_data_2019/flight_prediction/target/scala-2.12/flight_prediction_2.12-0.1.jar, que es donde se encuentra en el host, y lógicamente, dentro de la máquina de spark, eso no existe.
+-Por este motivo, la instrucción se tiene que ejecutar desde algún sitio que comparta almacenamiento con spark. SOLUCIÓN: un contenedor que haga la llamada y que tenga volumen compartido con spark
+    -Segundo error encontrado: el driver que se ejecuta falla debido a que no encunetra una clase
+        -Motivo y solución: el contenedor no tenía spark 3.1.2, por lo que hay que cambiar a uno con spark 3.1.2
+    -Tercer error encontrado: el driver falla porque no exixte /opt/bitnami/spark/.ivy2...
+        -Motivo y solución: al ejecutar spark-submit con la instrucción --packages utiliza ese directorio. Como el directorio es read only, falla. Para ello hay que tener un volumen compartido con el host e indicarle a spark-submit que --conf es ese directorio
+        -https://exchangetuts.com/i-cannot-use-package-option-on-bitnamispark-docker-container-1640444943522761
+        -https://github.com/bitnami/bitnami-docker-spark/issues/7
+-Comando a ejecutar: spark-submit --conf spark.jars.ivy=/opt/bitnami/spark/ivy --master spark://spark:7077 --deploy-mode cluster --class es.upm.dit.ging.predictor.MakePrediction --name FlightPrediction --packages org.mongodb.spark:mongo-spark-connector_2.12:3.0.1,org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.2 /opt/spark-apps/practica_big_data_2019/flight_prediction/target/scala-2.12/flight_prediction_2.12-0.1.jar
+    -Cuarto error encontrado: La página web envía el vuelo a kafka, spark streaming lo coge y hace la predicción (se puede ver entrando al contenedor de spark, dentro de work y del driver en stdout o en la interfaz web en el navegador) pero no se guarda en mongodb y por lo tanto no llega a la web.
