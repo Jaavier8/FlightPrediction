@@ -44,6 +44,7 @@ Antes de la ejecución, hay que generar el fichero jar que se pasa como argument
 -Comando a ejecutar: spark-submit --conf spark.jars.ivy=/opt/bitnami/spark/ivy --master spark://spark:7077 --deploy-mode cluster --class es.upm.dit.ging.predictor.MakePrediction --name FlightPrediction --packages org.mongodb.spark:mongo-spark-connector_2.12:3.0.1,org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.2 /opt/spark-apps/practica_big_data_2019/flight_prediction/target/scala-2.12/flight_prediction_2.12-0.1.jar
     -Cuarto error encontrado: La página web envía el vuelo a kafka, spark streaming lo coge y hace la predicción (se puede ver entrando al contenedor de spark, dentro de work y del driver en stdout o en la interfaz web en el navegador) pero no se guarda en mongodb y por lo tanto no llega a la web.
     -Motivo y solución: en la línea 142 de MakePrediction.scala se pasa la dirección de mongodb, pero no autorización (descubierto al entrar en el contenedor de spark, abrir una consola scala y ejecutar los comandos siguientes). Para autorizar hay que añadir al final ?authSource=admin
+    https://stackoverflow.com/questions/39576857/mongo-spark-connector-and-mongo-3-2-root-user-cannot-read-database
         -Encontrar fallo:
             -Abro contenedor spark
             -Ejecuto: spark-shell --conf spark.jars.ivy=/opt/bitnami/spark/ivy --packages org.mongodb.spark:mongo-spark-connector_2.12:3.0.1,org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.2
