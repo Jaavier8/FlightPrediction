@@ -2,10 +2,10 @@
 
 FROM sbtscala/scala-sbt:openjdk-8u342_1.8.0_2.12.17
 
-ADD practica_big_data_2019 /opt/spark-apps/practica_big_data_2019
+ADD practicaBD /opt/spark-apps/practicaBD
 #ADD spark-3.1.2-bin-hadoop3.2 /opt/spark
 
-WORKDIR /opt/spark-apps/practica_big_data_2019/flight_prediction
+WORKDIR /opt/spark-apps/practicaBD/flight_prediction
 
 COPY predictor-entrypoint.sh /bin/predictor-entrypoint.sh
 ENTRYPOINT ["predictor-entrypoint.sh"]
