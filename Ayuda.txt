@@ -8,6 +8,11 @@ Funcionamiento correcto: +1
 
 Antes de la ejecución, hay que generar el fichero jar que se pasa como argumento. El fichero jar se obtiene con sbt. Para ello, nos colocamos en la carpeta raíz del proyecto (~/Escritorio/BDFI/ProyectoFinal/practica_big_data_2019) y ejecutamos: 'sbt compile' y 'sbt package'. El fichero se guarda en target/scala-2.12/flight_prediction_2.12-0.1.jar
 
+
+
+
+
+
 *******dockerizar********
 -Kafka_zookeeper: https://hub.docker.com/r/bitnami/kafka
 -create kafka topic: https://stackoverflow.com/questions/64865361/docker-compose-create-kafka-topics
@@ -53,3 +58,15 @@ Antes de la ejecución, hay que generar el fichero jar que se pasa como argument
             -val sparkDocuments = sc.parallelize((1 to 10).map(i => Document.parse(s"{spark: $i}")))
             -MongoSpark.save(sparkDocuments, writeConfig)
             -Y obtenemos error de autenticación
+
+
+
+
+
+*******airflow********
+-Cuando se descarga sqlite3 hay que ejecutar: 'airflow db init' para que cree la tabla necesaria
+-Para que cree el dag sólo hay que copiar el setup.py en ~/airflow/dags
+-Para lanzar el dag: airflow dags trigger agile_data_science_batch_prediction_model_training
+-Para poder ejecutar spark-submit desde cualquier sitio (porque se utiliza en setup.py), hay que meterlo en el PATH => export PATH=$PATH:/home/javier/Escritorio/BDFI/ProyectoFinal/spark/spark/bin/
+-IMPORTANTE: hacer el EXPORT PROJECT_HOME tatnto en la consola que se levanta el webserver como en la consola que se levanta el scheduler, si no no funciona
+-En la línea 63 se le pasa el atributo dag al BashOperator. El DAG tiene los argumentos por defecto. Como se puede ver en la línea 12, si falla se reintenta hasta 3 veces, y lo hace cada 5 minutos.
