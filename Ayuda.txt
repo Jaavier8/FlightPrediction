@@ -70,3 +70,22 @@ Antes de la ejecución, hay que generar el fichero jar que se pasa como argument
 -Para poder ejecutar spark-submit desde cualquier sitio (porque se utiliza en setup.py), hay que meterlo en el PATH => export PATH=$PATH:/home/javier/Escritorio/BDFI/ProyectoFinal/spark/spark/bin/
 -IMPORTANTE: hacer el EXPORT PROJECT_HOME tatnto en la consola que se levanta el webserver como en la consola que se levanta el scheduler, si no no funciona
 -En la línea 63 se le pasa el atributo dag al BashOperator. El DAG tiene los argumentos por defecto. Como se puede ver en la línea 12, si falla se reintenta hasta 3 veces, y lo hace cada 5 minutos.
+
+
+
+
+
+*******k8s********
+-Para usar imágenes privadas hay que subirlas a dockerHub
+    1. Inicio sesión en terminal con docker login
+    2. Tageamos la imagen que queremos subir: docker tag mejora_docker_webapp jaavier8/webapp
+    3. Pusheamos al registro: docker push jaavier8/webapp
+
+-Para utilizar kubectl desde console: https://learn.microsoft.com/en-us/azure/aks/learn/quick-kubernetes-deploy-cli
+
+-En mongo, queda por ejecutar el mongoimport y mongosh, a ver si se puede con un initContainer
+-Problemas: 
+    -Desde la web no se accedía a kafka, daba timeout, lo que quería decir que conocía su dirección (la del servicio), pero no obtenía respuesta.
+     Esto es porque aunque estemos accediendo al servicio, el pod de kafka no está configurado para escuchar en la dirección IP que sirve el Service, por lo que no funciona.
+     La solución consiste en pasarle a kafka la variable de entorno KAFKA_CFG_ADVERTISED_LISTENERS con el valor "PLAINTEXT://kafka-srv:9092", con lo que le indicamos que escuche en esa dirección. Con esto, cuando la web envíe a esa dirección, el pod de kafka lo recibirá.
+     https://stackoverflow.com/questions/42998859/kafka-server-configuration-listeners-vs-advertised-listeners
