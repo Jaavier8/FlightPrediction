@@ -88,7 +88,7 @@ spec:
         - name: SPARK_MODE
           value: worker
         - name: SPARK_MASTER_URL
-          value: k8s://spark-srv:7077
+          value: spark-srv:7077
         - name: SPARK_WORKER_MEMORY
           value: 1G
         - name: SPARK_WORKER_CORES
