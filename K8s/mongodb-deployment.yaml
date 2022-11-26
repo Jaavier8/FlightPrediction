@@ -28,6 +28,10 @@ spec:
       containers:
       - name: mongodb
         image: mongo
+        lifecycle:
+          postStart:
+            exec:
+              command: [ 'bin/sh', '-c', 'apt-get update; apt-get install -y curl; curl -Lko ./origin_dest_distances.jsonl http://s3.amazonaws.com/agile_data_science/origin_dest_distances.jsonl; mongoimport --authenticationDatabase=admin --uri="mongodb://admin:password@localhost:27017/agile_data_science" -d agile_data_science -c origin_dest_distances --file origin_dest_distances.jsonl; mongosh -u "admin" -p "password" mongodb://admin:password@localhost:27017/agile_data_science --authenticationDatabase "admin" --eval "db.origin_dest_distances.createIndex({Origin: 1, Dest: 1})"' ]
         ports:
         - containerPort: 27017
         env:
