@@ -33,20 +33,29 @@ spec:
       volumes:
       - name: shared-data
         emptyDir: {}
+      - name: jars-dir
+        emptyDir: {}
       initContainers:
-      - name: content
-        image: alpine
+      - name: compileapp
+        image: jaavier8/predictork8s
         volumeMounts:
         - name: shared-data
-          mountPath: /pod-data
-        command: ["sh"]
-        args: ["-c", "echo Container: $HOSTNAME > /pod-data/index.html"]
+          mountPath: /opt/spark-apps
       containers:
       - name: sparkmaster
         image: bitnami/spark:3.1.2-debian-10-r130
+        lifecycle:
+          postStart:
+            exec:
+              command: [ 'bin/sh', '-c', 'spark-submit --conf spark.jars.ivy=/opt/bitnami/spark/ivy --master k8s://localhost:7077 --deploy-mode cluster --supervise --class es.upm.dit.ging.predictor.MakePrediction --name FlightPrediction --packages org.mongodb.spark:mongo-spark-connector_2.12:3.0.1,org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.2 /opt/spark-apps/practicaBD/flight_prediction/target/scala-2.12/flight_prediction_2.12-0.1.jar' ]
         ports:
         - containerPort: 8080
         - containerPort: 7077
+        volumeMounts:
+        - name: shared-data
+          mountPath: /opt/spark-apps
+        - name: jars-dir
+          mountPath: /opt/bitnami/spark/ivy
         env:
         - name: SPARK_MODE
           value: master
@@ -70,20 +79,25 @@ spec:
       volumes:
       - name: shared-data
         emptyDir: {}
+      - name: jars-dir
+        emptyDir: {}
       initContainers:
-      - name: content
-        image: alpine
+      - name: compileapp
+        image: jaavier8/predictork8s
         volumeMounts:
         - name: shared-data
-          mountPath: /pod-data
-        command: ["sh"]
-        args: ["-c", "echo Container: $HOSTNAME > /pod-data/index.html"]
+          mountPath: /opt/spark-apps
       containers:
       - name: sparkworker
         image: bitnami/spark:3.1.2-debian-10-r130
         ports:
         - containerPort: 8080
         - containerPort: 7077
+        volumeMounts:
+        - name: shared-data
+          mountPath: /opt/spark-apps
+        - name: jars-dir
+          mountPath: /opt/bitnami/spark/ivy
         env:
         - name: SPARK_MODE
           value: worker

@@ -89,3 +89,11 @@ Antes de la ejecución, hay que generar el fichero jar que se pasa como argument
      Esto es porque aunque estemos accediendo al servicio, el pod de kafka no está configurado para escuchar en la dirección IP que sirve el Service, por lo que no funciona.
      La solución consiste en pasarle a kafka la variable de entorno KAFKA_CFG_ADVERTISED_LISTENERS con el valor "PLAINTEXT://kafka-srv:9092", con lo que le indicamos que escuche en esa dirección. Con esto, cuando la web envíe a esa dirección, el pod de kafka lo recibirá.
      https://stackoverflow.com/questions/42998859/kafka-server-configuration-listeners-vs-advertised-listeners
+
+
+spark-submit --conf spark.jars.ivy=/opt/bitnami/spark/ivy --master k8s://http://spark-srv:7077 --deploy-mode cluster --supervise --conf spark.kubernetes.file.upload.path=/opt/aprk-apps --conf spark.kubernetes.container.image=bitnami/spark:3.1.2-debian-10-r130 --class es.upm.dit.ging.predictor.MakePrediction --name FlightPrediction --packages org.mongodb.spark:mongo-spark-connector_2.12:3.0.1,org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.2 /opt/spark-apps/practicaBD/flight_prediction/target/scala-2.12/flight_prediction_2.12-0.1.0-SNAPSHOT.jar
+
+SPARK-OPERATOR: https://yinxu4876455.medium.com/spark-operator-practices-with-kubernetes-ibm-cloud-kubernetes-service-9814dc5899c2
+
+kubectl describe sparkapplications predictor
+kubectl get sparkapplications
