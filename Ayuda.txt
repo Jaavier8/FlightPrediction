@@ -90,10 +90,18 @@ Antes de la ejecución, hay que generar el fichero jar que se pasa como argument
      La solución consiste en pasarle a kafka la variable de entorno KAFKA_CFG_ADVERTISED_LISTENERS con el valor "PLAINTEXT://kafka-srv:9092", con lo que le indicamos que escuche en esa dirección. Con esto, cuando la web envíe a esa dirección, el pod de kafka lo recibirá.
      https://stackoverflow.com/questions/42998859/kafka-server-configuration-listeners-vs-advertised-listeners
 
-
-spark-submit --conf spark.jars.ivy=/opt/bitnami/spark/ivy --master k8s://http://spark-srv:7077 --deploy-mode cluster --supervise --conf spark.kubernetes.file.upload.path=/opt/aprk-apps --conf spark.kubernetes.container.image=bitnami/spark:3.1.2-debian-10-r130 --class es.upm.dit.ging.predictor.MakePrediction --name FlightPrediction --packages org.mongodb.spark:mongo-spark-connector_2.12:3.0.1,org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.2 /opt/spark-apps/practicaBD/flight_prediction/target/scala-2.12/flight_prediction_2.12-0.1.0-SNAPSHOT.jar
-
-SPARK-OPERATOR: https://yinxu4876455.medium.com/spark-operator-practices-with-kubernetes-ibm-cloud-kubernetes-service-9814dc5899c2
-
-kubectl describe sparkapplications predictor
-kubectl get sparkapplications
+SPARK-OPERATOR explicación: https://yinxu4876455.medium.com/spark-operator-practices-with-kubernetes-ibm-cloud-kubernetes-service-9814dc5899c2
+-Para Spark se utiliza spark-operator, que se instala con helm:
+    -Instalación Helm: https://helm.sh/docs/intro/install/
+    -Instalar spark-operator: https://github.com/GoogleCloudPlatform/spark-on-k8s-operator
+    -Comandos útiles: 
+        *kubectl describe sparkapplications predictor
+        *kubectl get sparkapplications
+    -Se crea el yaml para lanzar la aplicación Spark
+        1-Construimos un Dockerfile partiendo de la imagen que utilizan en el ejemplo de spark-operator
+            1.1-Copiamos el repositorio ya compilado (con el jar)
+            1.2-Copiamos los jars porque si lo pasamos como paquetes (--packages), intenta instalarlos en /opt/spark/ivy2 y no existe (no he conseguido solucionarlo), por lo que la solución ha sido coger todos los jars necesarios, copiarlos a la imagen, y pasarlos con la opción --jar (los jars necesarios los he cogido de la mejora de Docker, dentro de predictor, en la carpeta compartida con la máquina)
+            1.3-Se da permisos a los jars, ya que sin ello la aplicación falla con el siguiente fallo: "ERROR TaskSchedulerImpl: Lost an executor 11 (already removed): Unable to create executor due to <jar>"
+                SOLUCIÓN: https://stackoverflow.com/questions/69902575/spark-on-kubernetes-with-minio-postgres-minio-unable-to-create-executor-du
+        2-Creamos el yaml de la SparkApplication
+            ****El que funciona actualmente es spark-application-TEST.yaml
