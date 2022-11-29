@@ -21,3 +21,7 @@ kubectl get all
 ```
 
 Observando la salida del comando anterior se puede ver la dirección por la cual se puede acceder a la aplicación desplegada, que es la dirección IP externa asignada al servicio *webapp-srv*.
+
+En las capturas adjuntas se puede comprobar el correcto funcionamiento de la aplicación desplegada con *k8s.*
+
+Actualmente se encuentra desplegado en: [http://20.237.58.83/flights/delays/predict_kafka](http://20.237.58.83/flights/delays/predict_kafka)
