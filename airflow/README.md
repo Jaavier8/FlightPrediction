@@ -28,6 +28,8 @@ El DAG está configurado para ejecutar el comando *spark-submit*, lo cual no fun
 export PATH=$PATH:<ruta-spark>
 ```
 
+En el DAG podemos ver que, en la línea 63 se le pasa el atributo dag al *BashOperator*. El DAG tiene los argumentos por defecto. Como se puede ver en la línea 12, si falla se reintenta hasta 3 veces, y lo hace cada 5 minutos.
+
 Si todo funciona correctamente podremos verlo en la interfaz gráfica, además de poder comprobar en la carpeta *models* que los ficheros se han actualizado mirando su hora de creación.
 
 
