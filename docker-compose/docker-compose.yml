@@ -11,7 +11,7 @@ services:
       - ALLOW_ANONYMOUS_LOGIN=yes
 
   kafka:
-    image: docker.io/bitnami/kafka:3.3
+    image: docker.io/bitnami/kafka:3.1.2
     ports:
       - "9092:9092"
     #volumes:
@@ -23,6 +23,7 @@ services:
     depends_on:
       - zookeeper
 
+  # Solved including KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true in kafka
   # To create the topic flight_delay_classification_request
   # This service execute command and exit with code 0
   # kafka-init:
@@ -94,17 +95,17 @@ services:
       - ./predictor/jars_dir:/opt/bitnami/spark/ivy:z
 
   spark-worker:
-    image: bitnami/spark:3.1.2-debian-10-r130
+    build: "./spark-worker"
     deploy:
-      replicas: 3
+      replicas: 1
     user: root
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://spark:7077
-      - SPARK_WORKER_MEMORY=1G
-      - SPARK_WORKER_CORES=2
-    #ports:
-    #  - '8081:8081'
+      - SPARK_WORKER_MEMORY=4G
+      - SPARK_WORKER_CORES=4
+    ports:
+      - '8081:8081'
 
     volumes:
       #- /home/javier/Escritorio/BDFI/ProyectoFinal/practica_big_data_2019/flight_prediction/target/scala-2.12:/opt/spark-apps
@@ -126,7 +127,7 @@ services:
     command: |
       "
       #Sleep until sbt compile and package
-      sleep 300
+      sleep 10
 
       echo -e 'Starting predictor'
       spark-submit --conf spark.jars.ivy=/opt/bitnami/spark/ivy --master spark://spark:7077 --deploy-mode cluster --supervise --class es.upm.dit.ging.predictor.MakePrediction --name FlightPrediction --packages org.mongodb.spark:mongo-spark-connector_2.12:3.0.1,org.apache.spark:spark-sql-kafka-0-10_2.12:3.1.2 /opt/spark-apps/practicaBD/flight_prediction/target/scala-2.12/flight_prediction_2.12-0.1.jar

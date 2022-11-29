@@ -6,6 +6,7 @@ ADD practicaBD /opt/spark-apps/practicaBD
 #ADD spark-3.1.2-bin-hadoop3.2 /opt/spark
 
 WORKDIR /opt/spark-apps/practicaBD/flight_prediction
-
-COPY predictor-entrypoint.sh /bin/predictor-entrypoint.sh
-ENTRYPOINT ["predictor-entrypoint.sh"]
+RUN sbt compile
+RUN sbt package
+#COPY predictor-entrypoint.sh /bin/predictor-entrypoint.sh
+#ENTRYPOINT ["predictor-entrypoint.sh"]

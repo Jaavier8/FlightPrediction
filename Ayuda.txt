@@ -105,3 +105,11 @@ SPARK-OPERATOR explicación: https://yinxu4876455.medium.com/spark-operator-prac
                 SOLUCIÓN: https://stackoverflow.com/questions/69902575/spark-on-kubernetes-with-minio-postgres-minio-unable-to-create-executor-du
         2-Creamos el yaml de la SparkApplication
             ****El que funciona actualmente es spark-application-TEST.yaml
+
+
+
+***************docker-compose fallo***************
+En el fichero scala ponía master local[8]. Al oner spark://spark:7077 falla. Descubro que es porque no tiene reursos y subo cores a 4 y memoria a 4G. Falla por algo de kafka -> cambio versión. NO ES eso
+El fallo es que los executors no tienen acceso a los jars que se descargan con la opción --packages (se encuentran en /ivy del worker). El executor busca en /jars, por lo que hay que copiarlos ahí
+
+Voy a utilizar la carpeta jars_dir/jars para copiarlos a la imagen

@@ -16,7 +16,7 @@ object MakePrediction {
     val spark = SparkSession
       .builder
       .appName("StructuredNetworkWordCount")
-      .master("local[*]")
+      .master("spark://spark:7077")
       .getOrCreate()
     import spark.implicits._
 
