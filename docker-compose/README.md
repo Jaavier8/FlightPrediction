@@ -5,7 +5,9 @@ El objetivo es conseguir el funcionamiento de la aplicación completa levantando
 Para cada uno de los microservicios que se requiere la creación de una imagen propia se crea un directorio, que son los siguientes:
 
 - **webapp.** Para la creación de la imagen de la aplicación *Flask.*
-- **predictor.** Para compilar la aplicación *Scala* y crear el fichero *jar* necesario para ejecutar la aplicación con el comando *spark-submit*.
+- **config.** Para realizar todos los pasos iniciales: clonar repositorio, cambiar valores necesarios en el fichero *MakePrediction.scala*, compilar la aplicación *Scala* y crear el fichero *jar* necesario para ejecutar la aplicación con el comando *spark-submit*, entre otros.
+- **init.** Para lanzar el comando *smark-submit* que hace que corra la aplicación.
+- **spark-worker.** Para copiar los ficheros *jar* necesarios.
 
 El fichero *docker-compose.yml* contiene la definición de todos los servicios. Para levantar el escenario completo, ejecute los siguientes comandos:
 
@@ -14,7 +16,7 @@ docker-compose build
 docker-compose up
 ```
 
-Pasados unos tres minutos, cuando todos los servicios hayan terminado de levantarse, se puede acceder a [http://localhost:5000/flights/delays/predict_kafka](http://localhost:5000/flights/delays/predict_kafka) y probar el correcto funcionamiento de la aplicación.
+Pasados unos minutos, cuando todos los servicios hayan terminado de levantarse, se puede acceder a [http://localhost:5000/flights/delays/predict_kafka](http://localhost:5000/flights/delays/predict_kafka) y probar el correcto funcionamiento de la aplicación.
 
 Para parar el escenario, ejecute el siguiente comando:
 
