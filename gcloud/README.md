@@ -10,4 +10,6 @@ El objetivo de esta mejora es conseguir levantar el escenario completo en *Googl
 
 En las capturas adjuntas se puede comprobar el correcto funcionamiento de la aplicación desplegada en *Google Cloud.*
 
-Actualmente se encuentra desplegado en: [http://34.175.44.173/flights/delays/predict_kafka](http://34.175.44.173/flights/delays/predict_kafka).
+Actualmente se encuentra desplegado en: [http://http://34.175.240.162/flights/delays/predict_kafka](http://http://34.175.240.162/flights/delays/predict_kafka).
+
+*Ha sido necesario cambiar a una máquina más potente, ya que la anterior se quedaba sin recursos pasado un tiempo, por lo que ha cambiado la dirección IP*
