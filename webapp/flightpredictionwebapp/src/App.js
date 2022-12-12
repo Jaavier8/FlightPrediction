@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Kafka } from "kafkajs";
 
 import {
   Divider,
@@ -12,6 +11,7 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { styled } from "@mui/material/styles";
+import SelectInput from "@mui/material/Select/SelectInput";
 
 const PREDICTION_TOPIC = 'flight_delay_classification_request';
 const host = process.env.KAFKA || "localhost";
@@ -26,34 +26,55 @@ const RootStyle = styled("div")({
 });
 
 function App() {
-  const [date, setDate] = useState(null);
 
-  const kafka = new Kafka({
-    clientId: 'my-app',
-    brokers: [`${host}:9092`],
-  })
-  const producer = kafka.producer();
+  const [origin, setOrigin] = useState("ATL");
+  const [destination, setDestination] = useState("SFO");
+  const [depDelay, setDepDelay] = useState(5);
+  const [carrier, setCarrier] = useState("AA");
+  const [date, setDate] = useState(new Date());
 
-  const sendMessage = async () => {
-    await producer.connect()
-    await producer.send({
-      topic: 'test-topic',
-      messages: [
-        { value: 'Hello KafkaJS user!' },
-      ],
-    })
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  const requestPrediction = async () => {
+    const details = {
+      "DepDelay": depDelay,
+      "Carrier": carrier,
+      "FlightDate": new Date(date.setHours(12, 0, 0, 0)).toISOString(),
+      "Origin": origin,
+      "Dest": destination
+    };
+    let formBody = [];
+    for (var property in details) {
+      const encodedKey = encodeURIComponent(property);
+      const encodedValue = encodeURIComponent(details[property]);
+      formBody.push(encodedKey + "=" + encodedValue);
+    }
+    formBody = formBody.join("&");
+    const reqPrediction = await fetch(`/flights/delays/predict/classify_realtime`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+      },
+      body: formBody,
+    });
+    if (reqPrediction.status === 200) {
+      const reqPredictionData = await reqPrediction.json();
+      if (reqPredictionData.status === "OK") {
+        getPrediction(reqPredictionData.id);
+      }
+    }
   }
 
-  const startPrediction = async () => {
-    //Coger valores
+  const getPrediction = async (predictionID) => {
+    let predictionInfo;
+    do {
+      console.log("Polling for prediction with ID: " + predictionID + "...");
+      predictionInfo = await fetch(`/flights/delays/predict/classify_realtime/response/${predictionID}`);
+      predictionInfo = await predictionInfo.json();
+      await sleep(1000);
+    } while (predictionInfo.status !== "OK");
 
-    //Añadir la distancia con una consulta a Mongo
-
-    //Dividir la fecha en dia, mes y año
-
-    //Añadir timestamp
-
-    //Crear UUID y enviar el mensaje
+    console.log("Prediction received!");
   }
 
   return (
@@ -73,11 +94,19 @@ function App() {
         <Stack sx={{ my: 1 }} direction="row" spacing={5}>
           <TextField
             fullWidth
+            value={origin}
+            onChange={(event) => {
+              setOrigin(event.target.value);
+            }}
             type="text"
             label="Origin"
           />
           <TextField
             fullWidth
+            value={destination}
+            onChange={(event) => {
+              setDestination(event.target.value);
+            }}
             type="text"
             label="Destination"
           />
@@ -86,12 +115,20 @@ function App() {
           <TextField
             sx={{ width: "33%" }}
             fullWidth
+            value={depDelay}
+            onChange={(event) => {
+              setDepDelay(event.target.value);
+            }}
             type="text"
             label="Departure Delay"
           />
           <TextField
             sx={{ width: "33%" }}
             fullWidth
+            value={carrier}
+            onChange={(event) => {
+              setCarrier(event.target.value);
+            }}
             type="text"
             label="Carrier"
           />
@@ -106,7 +143,7 @@ function App() {
             />
           </LocalizationProvider>
         </Stack>
-        <Button variant="contained" onClick={startPrediction}>
+        <Button variant="contained" onClick={requestPrediction}>
           Predict
         </Button>
       </Stack>
