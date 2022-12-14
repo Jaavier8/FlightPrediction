@@ -83,6 +83,8 @@ Antes de la ejecución, hay que generar el fichero jar que se pasa como argument
 
 -Para utilizar kubectl desde console: https://learn.microsoft.com/en-us/azure/aks/learn/quick-kubernetes-deploy-cli
 
+-Para permitir que el driver cree executors en el namespace por defecto: kubectl create clusterrolebinding default --clusterrole=edit --serviceaccount=default:default --namespace=default
+
 -En mongo, queda por ejecutar el mongoimport y mongosh, a ver si se puede con un initContainer
 -Problemas: 
     -Desde la web no se accedía a kafka, daba timeout, lo que quería decir que conocía su dirección (la del servicio), pero no obtenía respuesta.
